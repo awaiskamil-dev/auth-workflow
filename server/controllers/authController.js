@@ -1,7 +1,7 @@
 const User = require('../models/User');
 const { StatusCodes } = require('http-status-codes');
 const CustomError = require('../errors');
-const { attachCookiesToResponse, createTokenUser } = require('../utils');
+const { attachCookiesToResponse, createTokenUser, sendVerificationEmail } = require('../utils');
 
 const verifyEmail = async (req, res) => {
   const {verificationToken, email} = req.body;
@@ -38,6 +38,13 @@ const register = async (req, res) => {
   const verificationToken = 'fakeToken';
 
   const user = await User.create({ name, email, password, role, verificationToken });
+
+  await sendVerificationEmail({
+    name: user.name,
+    email: user.email,
+    verificationToken: user.verificationToken
+  });
+  
   res.status(StatusCodes.OK).json({
     mgs: 'Sucess, please check your email to verify account',
     verificationToken
