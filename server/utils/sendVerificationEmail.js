@@ -6,7 +6,7 @@ const sendVerificationEmail = async ({
   email,
   verificationToken
 }) => {
-  const verifyURL = `${process.env.ORIGIN}/verify-email?token=${verificationToken}&email=${email}`;
+  const verifyURL = `${process.env.ORIGIN}/user/verify-email?token=${verificationToken}&email=${email}`;
 
   const html = `
     <h2>Hello ${name}</h2>

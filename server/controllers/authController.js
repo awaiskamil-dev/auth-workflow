@@ -2,7 +2,11 @@ const User = require('../models/User');
 const Token = require('../models/Token');
 const { StatusCodes } = require('http-status-codes');
 const CustomError = require('../errors');
-const { attachCookiesToResponse, createTokenUser, sendVerificationEmail } = require('../utils');
+const {
+  attachCookiesToResponse, createTokenUser,
+  sendVerificationEmail, sendResetPassswordEmail,
+  createHash
+} = require('../utils');
 
 const verifyEmail = async (req, res) => {
   const {verificationToken, email} = req.body;
@@ -110,11 +114,55 @@ const logout = async (req, res) => {
 };
 
 const forgotPassword = async (req, res) => {
-  console.log('forgot password');
+  const {email} = req.body;
+  if(!email){
+    throw new CustomError.BadRequestError('Please provide a valid email');  
+  }
+
+  const user = await User.findOne({email});
+  if(user){
+    const passwordToken = crypto.randomBytes(70).toString('hex');
+    
+    await sendResetPassswordEmail({
+      name: user.name,
+      email: user.email,
+      token: passwordToken
+    });
+
+    const tenMinutes = 1000 * 60 * 10;
+    const passwordTokenExpirationDate = new Date(Date.now() + tenMinutes);
+
+    user.passwordToken = createHash(passwordToken);
+    user.passwordTokenExpirationDate = passwordTokenExpirationDate;
+    await user.save();
+
+    res.status(StatusCodes.OK).json({msg: 'Please check your email, for password reset link'});
+  }
 };
 
 const resetPassword = async (req, res) => {
-  console.log('reset password');
+  const {token, email, password} = req.body;
+  
+  if(!token || !email || !password){
+    throw new CustomError.BadRequestError('Please provide all values');
+  }
+
+  const user = await User.findOne({email});
+  if(user){
+    const currentDate = new Date();
+
+    if(
+      user.passwordTokenExpirationDate > currentDate &&
+      user.passwordToken === createHash(token)
+    ){
+      user.password = password;
+      user.passwordToken = null;
+      user.passwordTokenExpirationDate = null;
+      await user.save();
+    }
+  }
+
+  res.send('reset password');
 };
 
 module.exports = {
