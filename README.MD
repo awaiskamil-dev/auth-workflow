@@ -2,7 +2,7 @@
 
 A complete, production-style authentication system built with Node.js, Express, and MongoDB — featuring email verification, JWT access/refresh token rotation via httpOnly cookies, and a forgot/reset password flow. Includes a React frontend to test the full flow end to end.
 
-This project builds on top of my [e-commerce-api](https://github.com/awaiskamil-dev/e-commerce-api) project, taking its basic JWT auth and extending it into a full, stateful session-management system.
+This project builds on top of my [e-commerce-api](https://github.com/awaiskamil-dev/ecommerce-api) project, taking its basic JWT auth and extending it into a full, stateful session-management system.
 
 ## Features
 
