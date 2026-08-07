@@ -2,6 +2,7 @@ const User = require('../models/User');
 const Token = require('../models/Token');
 const { StatusCodes } = require('http-status-codes');
 const CustomError = require('../errors');
+const crypto = require('crypto');
 const {
   attachCookiesToResponse, createTokenUser,
   sendVerificationEmail, sendResetPassswordEmail,
@@ -103,11 +104,11 @@ const logout = async (req, res) => {
 
   res.cookie('accessToken', 'logout', {
     httpOnly: true,
-    expiresIn: new Date(Date.now()),
+    expires: new Date(Date.now()),
   })
   res.cookie('refreshToken', 'logout', {
     httpOnly: true,
-    expiresIn: new Date(Date.now()),
+    expires: new Date(Date.now()),
   })
 
   res.status(StatusCodes.OK).json({ msg: 'user logged out!' });

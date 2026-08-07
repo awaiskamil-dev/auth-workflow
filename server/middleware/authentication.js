@@ -7,11 +7,11 @@ const authenticateUser = async (req, res, next) => {
 
   try{
     if(accessToken){
-      const payload = isTokenValid(accessToken);
+      const payload = isTokenValid({token: accessToken});
       req.user = payload.user;
       return next();
     }
-    const payload = isTokenValid(refreshToken);
+    const payload = isTokenValid({token: refreshToken});
 
     const existingToken = await Token.findOne({
       user: payload.user.userId,
